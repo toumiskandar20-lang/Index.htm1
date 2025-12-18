@@ -1,0 +1,1085 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مهامي اليومية - إدارة المهام مع المشاركة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Tahoma', Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #166088;
+            --accent: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* الهيدر */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2.2rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* منطقة التنبيهات */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        /* الكارد الرئيسي */
+        .main-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .card-header {
+            background-color: var(--light);
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        /* إضافة مهمة جديدة */
+        .add-task-form {
+            display: flex;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+        
+        .task-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        .task-input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* قائمة المهام */
+        .tasks-container {
+            margin-top: 20px;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 18px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s;
+        }
+        
+        .task-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .task-item.completed {
+            opacity: 0.7;
+        }
+        
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            margin-left: 15px;
+            cursor: pointer;
+        }
+        
+        .task-content {
+            flex: 1;
+        }
+        
+        .task-title {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .task-title.completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        
+        .task-date {
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #888;
+            transition: color 0.3s;
+        }
+        
+        .edit-btn:hover {
+            color: var(--accent);
+        }
+        
+        .delete-btn:hover {
+            color: var(--danger);
+        }
+        
+        /* أقسام المشاركة */
+        .share-section, .auth-section {
+            margin-top: 30px;
+        }
+        
+        .share-url-container {
+            display: flex;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        
+        .url-display {
+            flex: 1;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            word-break: break-all;
+            font-size: 0.9rem;
+        }
+        
+        .copy-btn {
+            padding: 12px 20px;
+        }
+        
+        .google-btn {
+            background-color: white;
+            color: #757575;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .google-btn:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* الفوتر */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        /* حالة عدم الاتصال */
+        .offline-notice {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--warning);
+            color: var(--dark);
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+            z-index: 1000;
+        }
+        
+        /* التكيف مع الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .user-section {
+                align-self: flex-end;
+            }
+            
+            .add-task-form {
+                flex-direction: column;
+            }
+            
+            .share-url-container {
+                flex-direction: column;
+            }
+            
+            .task-actions {
+                flex-direction: column;
+            }
+        }
+        
+        /* تحسينات للوضع المظلم */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a1a1a;
+                color: #f0f0f0;
+            }
+            
+            .main-card {
+                background-color: #2d2d2d;
+            }
+            
+            .card-header {
+                background-color: #3a3a3a;
+                border-bottom-color: #444;
+            }
+            
+            .task-input {
+                background-color: #3a3a3a;
+                border-color: #555;
+                color: #f0f0f0;
+            }
+            
+            .url-display {
+                background-color: #3a3a3a;
+                border-color: #555;
+                color: #f0f0f0;
+            }
+            
+            .task-item:hover {
+                background-color: #3a3a3a;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- إشعار حالة الاتصال -->
+    <div class="offline-notice" id="offlineNotice">
+        <i class="fas fa-wifi-slash"></i> أنت تعمل في وضع عدم الاتصال. سيتم حفظ التغييرات محلياً.
+    </div>
+    
+    <!-- الهيدر -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-tasks"></i>
+                <h1>مهامي اليومية</h1>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <div class="user-avatar" id="userAvatar">م</div>
+                    <span id="userName">محمد</span>
+                </div>
+                <div id="googleLoginBtn"></div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- المحتوى الرئيسي -->
+    <div class="container">
+        <!-- تنبيهات -->
+        <div class="alert alert-info" id="welcomeAlert">
+            <div>
+                <i class="fas fa-info-circle"></i>
+                <span>مرحباً! يمكنك إضافة مهامك اليومية ومشاركتها مع الآخرين عبر رابط.</span>
+            </div>
+            <button class="action-btn" onclick="hideAlert('welcomeAlert')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <!-- الكارد الرئيسي للمهام -->
+        <div class="main-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-list-check"></i>
+                    <span>قائمة مهام اليوم</span>
+                </div>
+                <div>
+                    <button class="btn btn-outline" onclick="exportTasks()">
+                        <i class="fas fa-download"></i> تصدير
+                    </button>
+                    <button class="btn btn-outline" onclick="importTasks()" style="margin-right: 10px;">
+                        <i class="fas fa-upload"></i> استيراد
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <!-- نموذج إضافة مهمة جديدة -->
+                <div class="add-task-form">
+                    <input type="text" class="task-input" id="newTaskInput" placeholder="أضف مهمة جديدة...">
+                    <button class="btn btn-primary" onclick="addNewTask()">
+                        <i class="fas fa-plus"></i> إضافة
+                    </button>
+                </div>
+                
+                <!-- قائمة المهام -->
+                <div class="tasks-container" id="tasksList">
+                    <!-- المهام ستضاف هنا ديناميكياً -->
+                    <div class="task-item">
+                        <div class="task-content">
+                            <div class="task-title">مرحباً! هذه مهمة تجريبية</div>
+                            <div class="task-date">تمت الإضافة: اليوم</div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="action-btn edit-btn">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-btn">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <input type="checkbox" class="task-checkbox">
+                    </div>
+                </div>
+                
+                <!-- إحصائيات المهام -->
+                <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 10px; text-align: center;">
+                    <div style="display: flex; justify-content: space-around;">
+                        <div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary);" id="totalTasks">0</div>
+                            <div style="font-size: 0.9rem; color: #666;">إجمالي المهام</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--success);" id="completedTasks">0</div>
+                            <div style="font-size: 0.9rem; color: #666;">مكتملة</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--warning);" id="pendingTasks">0</div>
+                            <div style="font-size: 0.9rem; color: #666;">قيد التنفيذ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- قسم المشاركة -->
+        <div class="main-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-share-alt"></i>
+                    <span>مشاركة قائمة المهام</span>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <p>قم بنسخ الرابط التالي ومشاركته مع الآخرين لعرض قائمة المهام:</p>
+                
+                <div class="share-url-container">
+                    <div class="url-display" id="shareUrlDisplay">جارٍ إنشاء رابط المشاركة...</div>
+                    <button class="btn btn-primary copy-btn" onclick="copyShareUrl()">
+                        <i class="fas fa-copy"></i> نسخ
+                    </button>
+                </div>
+                
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="allowEditCheckbox" onchange="updateShareUrl()">
+                        <span>السماح بالتحرير من قبل الآخرين</span>
+                    </label>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background-color: #e7f5ff; border-radius: 10px;">
+                    <i class="fas fa-lightbulb" style="color: var(--accent); margin-left: 10px;"></i>
+                    <span>عند مشاركة الرابط، يمكن للآخرين عرض قائمة المهام. يمكنك تفعيل خيار "السماح بالتحرير" ليتمكنوا من تعديل المهام أيضاً.</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- قسم تسجيل الدخول -->
+        <div class="main-card" id="authSection">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-user"></i>
+                    <span>تسجيل الدخول بحساب جوجل</span>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <p>سجل الدخول بحساب جوجل لحفظ مهامك على السحابة والوصول إليها من أي جهاز:</p>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <div id="googleAuthBtn" style="display: inline-block;"></div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 10px;">
+                    <i class="fas fa-info-circle" style="color: var(--accent); margin-left: 10px;"></i>
+                    <span>عند تسجيل الدخول، سيتم حفظ مهامك في حساب جوجل الخاص بك وسيمكنك الوصول إليها من أي جهاز.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- الفوتر -->
+    <footer>
+        <div class="container">
+            <p>© 2023 مهامي اليومية - جميع الحقوق محفوظة</p>
+            <p>تم التطوير باستخدام HTML و CSS و JavaScript</p>
+            <p style="margin-top: 10px; font-size: 0.8rem;">
+                <i class="fas fa-shield-alt"></i> بياناتك محفوظة محلياً في متصفحك ولا نشاركها مع أي طرف ثالث
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // بيانات التطبيق
+        let tasks = [];
+        let currentUser = null;
+        let shareToken = null;
+        let isSharedView = false;
+        
+        // تهيئة التطبيق عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            // التحقق من رابط المشاركة
+            checkForSharedLink();
+            
+            // تحميل المهام من التخزين المحلي
+            loadTasks();
+            
+            // إنشاء رابط المشاركة
+            updateShareUrl();
+            
+            // تحديث إحصائيات المهام
+            updateStats();
+            
+            // تهيئة زر تسجيل الدخول بجوجل
+            initializeGoogleAuth();
+            
+            // إضافة مستمع حدث للزر Enter في حقل إضافة المهمة
+            document.getElementById('newTaskInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addNewTask();
+                }
+            });
+            
+            // مراقبة حالة الاتصال
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            updateOnlineStatus();
+        });
+        
+        // وظيفة إضافة مهمة جديدة
+        function addNewTask() {
+            const taskInput = document.getElementById('newTaskInput');
+            const taskText = taskInput.value.trim();
+            
+            if (taskText === '') {
+                showAlert('يرجى إدخال نص المهمة', 'warning');
+                return;
+            }
+            
+            // إنشاء كائن المهمة الجديدة
+            const newTask = {
+                id: Date.now(),
+                text: taskText,
+                completed: false,
+                createdAt: new Date().toLocaleDateString('ar-SA'),
+                createdBy: currentUser ? currentUser.name : 'مستخدم'
+            };
+            
+            // إضافة المهمة للقائمة
+            tasks.push(newTask);
+            
+            // حفظ المهام
+            saveTasks();
+            
+            // تحديث العرض
+            renderTasks();
+            
+            // تفريغ حقل الإدخال
+            taskInput.value = '';
+            
+            // إظهار تنبيه النجاح
+            showAlert('تمت إضافة المهمة بنجاح', 'success');
+        }
+        
+        // وظيفة عرض المهام
+        function renderTasks() {
+            const tasksList = document.getElementById('tasksList');
+            
+            if (tasks.length === 0) {
+                tasksList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #777;">
+                        <i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <h3>لا توجد مهام حالياً</h3>
+                        <p>ابدأ بإضافة مهمة جديدة باستخدام الحقل أعلاه</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // ترتيب المهام (غير المكتملة أولاً)
+            const sortedTasks = [...tasks].sort((a, b) => {
+                if (a.completed && !b.completed) return 1;
+                if (!a.completed && b.completed) return -1;
+                return b.id - a.id;
+            });
+            
+            // إنشاء HTML للمهام
+            let tasksHTML = '';
+            
+            sortedTasks.forEach(task => {
+                tasksHTML += `
+                    <div class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+                        <div class="task-content">
+                            <div class="task-title ${task.completed ? 'completed' : ''}">${task.text}</div>
+                            <div class="task-date">تمت الإضافة: ${task.createdAt} - بواسطة: ${task.createdBy}</div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="action-btn edit-btn" onclick="editTask(${task.id})" ${isSharedView && !allowEdit ? 'disabled style="opacity:0.5;"' : ''}>
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteTask(${task.id})" ${isSharedView && !allowEdit ? 'disabled style="opacity:0.5;"' : ''}>
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTaskCompletion(${task.id})" ${isSharedView && !allowEdit ? 'disabled' : ''}>
+                    </div>
+                `;
+            });
+            
+            tasksList.innerHTML = tasksHTML;
+            
+            // تحديث الإحصائيات
+            updateStats();
+        }
+        
+        // وظيفة تغيير حالة المهمة (مكتملة/غير مكتملة)
+        function toggleTaskCompletion(taskId) {
+            const taskIndex = tasks.findIndex(task => task.id === taskId);
+            
+            if (taskIndex !== -1) {
+                tasks[taskIndex].completed = !tasks[taskIndex].completed;
+                saveTasks();
+                renderTasks();
+            }
+        }
+        
+        // وظيفة تعديل المهمة
+        function editTask(taskId) {
+            const taskIndex = tasks.findIndex(task => task.id === taskId);
+            
+            if (taskIndex !== -1) {
+                const newText = prompt('عدّل نص المهمة:', tasks[taskIndex].text);
+                
+                if (newText !== null && newText.trim() !== '') {
+                    tasks[taskIndex].text = newText.trim();
+                    saveTasks();
+                    renderTasks();
+                    showAlert('تم تعديل المهمة بنجاح', 'success');
+                }
+            }
+        }
+        
+        // وظيفة حذف المهمة
+        function deleteTask(taskId) {
+            if (confirm('هل أنت متأكد من حذف هذه المهمة؟')) {
+                tasks = tasks.filter(task => task.id !== taskId);
+                saveTasks();
+                renderTasks();
+                showAlert('تم حذف المهمة بنجاح', 'success');
+            }
+        }
+        
+        // وظيفة حفظ المهام في التخزين المحلي
+        function saveTasks() {
+            // حفظ في localStorage
+            localStorage.setItem('dailyTasks', JSON.stringify(tasks));
+            
+            // إذا كان المستخدم مسجل الدخول، حفظ في التخزين السحابي (محاكاة)
+            if (currentUser) {
+                // في التطبيق الحقيقي، هنا نرسل البيانات لخادم
+                console.log('تم حفظ المهام في حساب جوجل للمستخدم:', currentUser.name);
+            }
+        }
+        
+        // وظيفة تحميل المهام من التخزين المحلي
+        function loadTasks() {
+            const savedTasks = localStorage.getItem('dailyTasks');
+            
+            if (savedTasks) {
+                tasks = JSON.parse(savedTasks);
+                renderTasks();
+            } else {
+                // إذا لم تكن هناك مهام محفوظة، نضيف مهمة تجريبية
+                tasks = [{
+                    id: Date.now(),
+                    text: 'مرحباً! هذه مهمة تجريبية',
+                    completed: false,
+                    createdAt: new Date().toLocaleDateString('ar-SA'),
+                    createdBy: 'النظام'
+                }];
+                saveTasks();
+                renderTasks();
+            }
+        }
+        
+        // وظيفة تحديث إحصائيات المهام
+        function updateStats() {
+            const totalTasks = tasks.length;
+            const completedTasks = tasks.filter(task => task.completed).length;
+            const pendingTasks = totalTasks - completedTasks;
+            
+            document.getElementById('totalTasks').textContent = totalTasks;
+            document.getElementById('completedTasks').textContent = completedTasks;
+            document.getElementById('pendingTasks').textContent = pendingTasks;
+        }
+        
+        // وظيفة إنشاء رابط المشاركة
+        function updateShareUrl() {
+            // إنشاء رمز المشاركة
+            if (!shareToken) {
+                shareToken = generateShareToken();
+                localStorage.setItem('shareToken', shareToken);
+            }
+            
+            // الحصول على إعداد السماح بالتعديل
+            const allowEdit = document.getElementById('allowEditCheckbox').checked;
+            
+            // إنشاء رابط المشاركة
+            const baseUrl = window.location.origin + window.location.pathname;
+            const shareUrl = `${baseUrl}?share=${shareToken}${allowEdit ? '&edit=true' : ''}`;
+            
+            // عرض الرابط
+            document.getElementById('shareUrlDisplay').textContent = shareUrl;
+        }
+        
+        // وظيفة نسخ رابط المشاركة
+        function copyShareUrl() {
+            const urlDisplay = document.getElementById('shareUrlDisplay');
+            const shareUrl = urlDisplay.textContent;
+            
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showAlert('تم نسخ رابط المشاركة إلى الحافظة', 'success');
+            }).catch(err => {
+                // طريقة بديلة للنسخ
+                const textArea = document.createElement('textarea');
+                textArea.value = shareUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showAlert('تم نسخ رابط المشاركة إلى الحافظة', 'success');
+            });
+        }
+        
+        // وظيفة التحقق من رابط المشاركة
+        function checkForSharedLink() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const shareParam = urlParams.get('share');
+            
+            if (shareParam) {
+                isSharedView = true;
+                const editParam = urlParams.get('edit');
+                const allowEdit = editParam === 'true';
+                
+                // عرض حالة العرض المشترك
+                showAlert(`أنت تشاهد قائمة مهام مشتركة${allowEdit ? ' مع صلاحية التعديل' : ' للعرض فقط'}`, 'info');
+                
+                // إخفاء أقسام الإضافة والتسجيل في وضع العرض المشترك
+                document.getElementById('newTaskInput').style.display = 'none';
+                document.querySelector('.add-task-form .btn-primary').style.display = 'none';
+                document.getElementById('authSection').style.display = 'none';
+                
+                // إضافة نص توضيحي
+                const formContainer = document.querySelector('.add-task-form');
+                const infoText = document.createElement('div');
+                infoText.innerHTML = `<div style="padding: 10px; background-color: #f0f8ff; border-radius: 8px; text-align: center; flex: 1;">
+                    <i class="fas fa-eye"></i> أنت في وضع العرض المشترك ${allowEdit ? 'مع إمكانية التعديل' : 'للعرض فقط'}
+                </div>`;
+                formContainer.appendChild(infoText);
+            }
+        }
+        
+        // وظيفة تصدير المهام
+        function exportTasks() {
+            const dataStr = JSON.stringify(tasks, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'مهامي_اليومية_' + new Date().toLocaleDateString('ar-SA') + '.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showAlert('تم تصدير المهام بنجاح', 'success');
+        }
+        
+        // وظيفة استيراد المهام
+        function importTasks() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const importedTasks = JSON.parse(e.target.result);
+                        
+                        if (Array.isArray(importedTasks)) {
+                            // دمج المهام المستوردة مع المهام الحالية
+                            const existingIds = tasks.map(task => task.id);
+                            const newTasks = importedTasks.filter(task => !existingIds.includes(task.id));
+                            
+                            tasks = [...tasks, ...newTasks];
+                            saveTasks();
+                            renderTasks();
+                            
+                            showAlert(`تم استيراد ${newTasks.length} مهمة بنجاح`, 'success');
+                        } else {
+                            showAlert('ملف غير صالح', 'warning');
+                        }
+                    } catch (error) {
+                        showAlert('خطأ في قراءة الملف', 'warning');
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+        
+        // وظيفة إظهار التنبيهات
+        function showAlert(message, type) {
+            // إزالة أي تنبيهات سابقة
+            const existingAlert = document.querySelector('.alert:not(#welcomeAlert)');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+            
+            // إنشاء التنبيه الجديد
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <div>
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+                <button class="action-btn" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // إضافة التنبيه بعد التنبيه الترحيبي
+            const welcomeAlert = document.getElementById('welcomeAlert');
+            welcomeAlert.parentNode.insertBefore(alertDiv, welcomeAlert.nextSibling);
+            
+            // إزالة التنبيه تلقائياً بعد 5 ثواني
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+        
+        // وظيفة إخفاء التنبيه
+        function hideAlert(alertId) {
+            const alert = document.getElementById(alertId);
+            if (alert) {
+                alert.style.display = 'none';
+            }
+        }
+        
+        // وظيفة تحديث حالة الاتصال
+        function updateOnlineStatus() {
+            const offlineNotice = document.getElementById('offlineNotice');
+            
+            if (!navigator.onLine) {
+                offlineNotice.style.display = 'block';
+                showAlert('أنت تعمل في وضع عدم الاتصال. سيتم حفظ التغييرات محلياً.', 'warning');
+            } else {
+                offlineNotice.style.display = 'none';
+            }
+        }
+        
+        // وظيفة إنشاء رمز المشاركة
+        function generateShareToken() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        }
+        
+        // وظيفة تهيئة مصادقة جوجل
+        function initializeGoogleAuth() {
+            // تهيئة زر جوجل
+            const googleLoginBtn = document.getElementById('googleLoginBtn');
+            const googleAuthBtn = document.getElementById('googleAuthBtn');
+            
+            // التحقق مما إذا كان المستخدم مسجلاً بالفعل
+            const savedUser = localStorage.getItem('googleUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUserDisplay();
+            }
+            
+            // إنشاء زر تسجيل الدخول
+            googleLoginBtn.innerHTML = `
+                <button class="google-btn" onclick="handleGoogleLogin()" id="googleLoginButton">
+                    <img src="https://img.icons8.com/color/16/000000/google-logo.png" class="google-icon">
+                    <span>${currentUser ? 'تسجيل الخروج' : 'تسجيل الدخول بجوجل'}</span>
+                </button>
+            `;
+            
+            googleAuthBtn.innerHTML = `
+                <button class="btn btn-primary" onclick="handleGoogleLogin()" style="padding: 12px 30px;">
+                    <img src="https://img.icons8.com/color/16/000000/google-logo.png" style="margin-left: 8px;">
+                    <span>${currentUser ? 'تسجيل الخروج' : 'تسجيل الدخول بحساب جوجل'}</span>
+                </button>
+            `;
+        }
+        
+        // وظيفة معالجة تسجيل الدخول بجوجل (محاكاة)
+        function handleGoogleLogin() {
+            if (currentUser) {
+                // تسجيل الخروج
+                currentUser = null;
+                localStorage.removeItem('googleUser');
+                showAlert('تم تسجيل الخروج بنجاح', 'success');
+            } else {
+                // تسجيل الدخول (محاكاة - في التطبيق الحقيقي سيكون باستخدام Google OAuth)
+                const userName = prompt('أدخل اسمك للمحاكاة (في التطبيق الحقيقي سيكون باستخدام جوجل):', 'محمد');
+                
+                if (userName) {
+                    currentUser = {
+                        name: userName,
+                        email: `${userName.toLowerCase().replace(/\s/g, '')}@example.com`,
+                        picture: null
+                    };
+                    
+                    localStorage.setItem('googleUser', JSON.stringify(currentUser));
+                    showAlert(`مرحباً ${userName}! تم تسجيل الدخول بنجاح`, 'success');
+                    
+                    // مزامنة المهام مع "السحابة" (محاكاة)
+                    setTimeout(() => {
+                        showAlert('تم مزامنة مهامك مع حساب جوجل', 'success');
+                    }, 1000);
+                }
+            }
+            
+            updateUserDisplay();
+            initializeGoogleAuth();
+        }
+        
+        // وظيفة تحديث عرض معلومات المستخدم
+        function updateUserDisplay() {
+            const userInfo = document.getElementById('userInfo');
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            
+            if (currentUser) {
+                userInfo.style.display = 'flex';
+                userAvatar.textContent = currentUser.name.charAt(0);
+                userName.textContent = currentUser.name;
+            } else {
+                userInfo.style.display = 'none';
+            }
+        }
+        
+        // في التطبيق الحقيقي، ستكون دالة تسجيل الدخول باستخدام Google OAuth كما يلي:
+        /*
+        function handleGoogleLoginReal() {
+            google.accounts.id.initialize({
+                client_id: 'YOUR_GOOGLE_CLIENT_ID',
+                callback: handleCredentialResponse
+            });
+            
+            google.accounts.id.renderButton(
+                document.getElementById('googleLoginBtn'),
+                { theme: 'outline', size: 'large', text: 'signin_with' }
+            );
+        }
+        
+        function handleCredentialResponse(response) {
+            // معالجة استجابة جوجل
+            const user = parseJwt(response.credential);
+            currentUser = {
+                name: user.name,
+                email: user.email,
+                picture: user.picture
+            };
+            
+            localStorage.setItem('googleUser', JSON.stringify(currentUser));
+            updateUserDisplay();
+            showAlert(`مرحباً ${user.name}! تم تسجيل الدخول بنجاح`, 'success');
+        }
+        
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(window.atob(base64));
+        }
+        */
+    </script>
+</body>
+</html>
